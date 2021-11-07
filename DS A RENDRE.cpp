@@ -1,142 +1,181 @@
 #include <iostream>
 #include <string.h>
-#include <String>
+
 using namespace std;
 
+
 struct Article {
+public:    
     int id;
     int stock;
     float prix;
     string description;
     Article* suivant;
 };
-//typedef Article* listeArticle;
+
 
 struct Item {
+public:
     int quantite;
     Article* article;
     Item* suivant;
 };
-//typedef Item* listeItem;
 
 struct Commande {
+public:
     int id;
     Item* item;
     Commande* suivant;
 };
-//typedef Commande* listeCommande;
 
-void AjouterArticle(Article &L, string description, int stock, float prix){
-	Article *s= new Article;
-	s->description=description;	
-	static int cpt=1;
-	s->stock =stock;
-	s->prix =prix;
-	if(cpt==1)
-	{
-		s->suivant=NULL;
-	}
-	else
-	{
-		s->suivant= &L;
-	}
-	s->id=cpt;
-	cpt++;
+
+/**
+ * Créer un nouvel article et l'ajouter a la liste des articles.
+*/
+void AjouterArticle(Article &art, string description, int stock, float prix){
+    
+    Article *newArt = new Article;
+    
+    static int id_cpt = 1;
+    
+    newArt->description = description;
+    newArt->stock = stock;
+    newArt->prix = prix;
+    
+
+    if( art.suivant == NULL ){
+        newArt->id = id_cpt;
+        art = *newArt;
+    }else{
+        newArt->id = art.suivant->id+1;
+        newArt->suivant = &art;
+    }
+
+   //cout <<"\t\t id: " <<art->id <<" description: "<< art->description <<" stock: "<< art->stock <<" prix: "<<art->prix<<"\t"<<endl;
+
+
+    cout <<"\t\t id: " <<art.id <<" description: "<< art.description <<" stock: "<< art.stock <<" prix: "<<art.prix<<"\t"<<endl;
+
+
+
 };
 
-void afficherArticle(Article Li){
-	Article *tmp = &Li;
-	while(tmp->suivant != NULL){
-		cout <<"\t\t id: " <<tmp->id <<" description: "<< tmp->description <<" stock: "<< tmp->stock <<" prix: "<<tmp->prix<<"\t"<<endl;
-		tmp->suivant = tmp;
-	}
+/**
+ * Afficher les articles présent dans la liste des articles.
+*/
+void afficherArticle(Article L){
+    
+    Article *tmp = NULL;
+    tmp = &L;
+
+    while(tmp->suivant != NULL){
+        cout <<"\t\t id: " <<tmp->id <<" description: "<< tmp->description <<" stock: "<< tmp->stock <<" prix: "<<tmp->prix<<"\t"<<endl;
+        tmp = tmp->suivant; 
+    }
 }
 
+/**
+ * Changer la quantité du stock d'un article identifier par son ID.
+*/
 int EnterStock(int numArt, int qte, Article art){
-		Article *curr = &art;
-		
-		while(curr != NULL)
-		{
-			if(curr->id == numArt)
-			{
-				curr->stock = qte;
-				art = *curr;
-				
-				return 1;
-			}
-			curr = curr->suivant;
-		}
-		return 0;
-		
-		
+        
+    Article *curr = &art;
+        
+    while(curr != NULL){
+        if(curr->id == numArt){
+            curr->stock = qte;
+            art = *curr;
+            return 1;
+        }
+        curr = curr->suivant;
+    }
+    return 0; 
 }
 
+/**
+ * Insert une nouvelle commande en queue de liste.
+*/
 void InsertCommande(Commande &cde, Article art, int numArticle, int Qte){
-	Item *newItem = new Item;
-	newItem->quantite = Qte;
-	newItem->article = &art;
-	newItem->suivant = NULL;
-	if (cde.suivant == NULL){
-		cde.id = numArticle;
-		cde.item = newItem;
-		cde.suivant = NULL;
-	}
-	
-		
+    
+    Item *newItem = new Item();
+    Commande currCde = cde;
+    
+    newItem->quantite = Qte;
+    newItem->article = &art;
+    newItem->suivant = NULL;
+    
+    while( currCde.suivant != NULL ){
+        //Itérer dans la liste des commande pour atteindre la dernière commande.
+    }
+    
+    // 
+    if (currCde.item->suivant == NULL){
+        currCde.id = numArticle;
+        currCde.item = newItem;
+        currCde.suivant = NULL;
+    }else{
+        currCde.id = numArticle;
+        currCde.item->suivant = newItem;
+        currCde.suivant = NULL;
+    }     
 }
 
 void PrintCdesArt(Article art, Commande cde){
-	Commande tmp = cde;
-	int sumQte = 0;
-	while(tmp.suivant != NULL){
-		if(art.id == tmp.id){
-			sumQte += tmp.item->quantite;
-		}
-		tmp.suivant = tmp.suivant;
-	}
-	cout<<sumQte<<endl;
+    Commande tmp = cde;
+    int sumQte = 0;
+    while(tmp.suivant != NULL){
+        if(art.id == tmp.id){
+            sumQte += tmp.item->quantite;
+        }
+        tmp.suivant = tmp.suivant;
+    }
+    cout<<sumQte<<endl;
 }
 
+/*
 checkstock(int numcde, Commande cde){
-	
+    
 }
 
 FactureCommande(int numcde, Commande cde){
-	
+    
 }
-
-
-
+*/
 
 int main()
-{	
-	Article L;
-	Commande Lc;
-	
+{
+    
+   
 
-	AjouterArticle(L,"Pomme",56,50);
-	AjouterArticle(L,"Poire",15,40);
-	AjouterArticle(L,"Cerise",42,30);
-	AjouterArticle(L,"Fraise",23,20);
-	AjouterArticle(L,"Raisin",12,10);
-	AjouterArticle(L,"Banane",10,5);
-	cout<<endl<<"(----Affichage Article----)"<<endl<<endl;
-	afficherArticle(L);
-	
-	EnterStock(2,30,L);
-	cout<<endl<<"(----Affichage stock modifie----)"<<endl<<endl;
-	afficherArticle(L);	
-	
-	InsertCommande(Lc,L,6,30);
-	
-	//PrintCdesArt();
-	cout<<endl<<"(----Affichage Commande----)"<<endl<<endl;
-	afficherArticle(L);
-	
+    Article * art = NULL;
+    Commande * cde = NULL;
+    art = new Article;
+    cde = new Commande; 
+    
 
-	//cout<<endl<<"//////////////Afficher enter stock /////////////"<<endl<<endl;
+    AjouterArticle(*art,"Pomme",56,50);
+    AjouterArticle(*art,"Poire",15,40);
+    AjouterArticle(*art,"Cerise",42,30);
+    AjouterArticle(*art,"Fraise",23,20);
+    AjouterArticle(*art,"Raisin",12,10);
+    AjouterArticle(*art,"Banane",10,5);
+    cout<<endl<<"(----Affichage Article----)"<<endl<<endl;
+    afficherArticle(*art);
+    
+    //EnterStock(2,30,*art);
+    cout<<endl<<"(----Affichage stock modifie----)"<<endl<<endl;
+    //afficherArticle(*art);
+    
+    //InsertCommande(*cde,*art,6,30);
+    
+    //PrintCdesArt();
+    cout<<endl<<"(----Affichage Commande----)"<<endl<<endl;
+    //afficherArticle(*art);
+    
+
+    //cout<<endl<<"//////////////Afficher enter stock /////////////"<<endl<<endl;
 
 
-	
+    
     return 0;
 }
